@@ -1,33 +1,35 @@
 package com.redhat.coolstore.service;
 
 import com.redhat.coolstore.model.Order;
-import java.util.List;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import io.quarkus.hibernate.orm.Panache;
+import io.quarkus.hibernate.orm.PanacheEntity;
+import io.quarkus.hibernate.orm.PanacheEntityBase;
+import io.quarkus.hibernate.orm.PanacheQuery;
 
-@Stateless
+@PanacheEntity(tableName = "orders")
+public class OrderEntity extends PanacheEntityBase<OrderEntity> {
+
+    public long id;
+    // Add other fields of the Order class here
+
+    public static OrderEntity findById(Long id) {
+        return findById(OrderEntity.class, id);
+    }
+}
+
 public class OrderService {
 
-  @Inject
-  private EntityManager em;
-
   public void save(Order order) {
-    em.persist(order);
+    OrderEntity orderEntity = new OrderEntity();
+    // Map the Order object to OrderEntity here
+    orderEntity.persist();
   }
 
-  public List<Order> getOrders() {
-    CriteriaBuilder cb = em.getCriteriaBuilder();
-    CriteriaQuery<Order> criteria = cb.createQuery(Order.class);
-    Root<Order> member = criteria.from(Order.class);
-    criteria.select(member);
-    return em.createQuery(criteria).getResultList();
+  public List<OrderEntity> getOrders() {
+    return OrderEntity.listAll();
   }
 
-  public Order getOrderById(long id) {
-    return em.find(Order.class, id);
+  public OrderEntity getOrderById(long id) {
+    return OrderEntity.findById(id);
   }
 }

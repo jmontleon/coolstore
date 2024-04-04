@@ -1,78 +1,64 @@
 package com.redhat.coolstore.service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
 
 import com.redhat.coolstore.model.ShoppingCart;
 
-@Stateless
-@Remote
+@Deprecated
 public class ShippingService implements ShippingServiceRemote {
 
     @Override
     public double calculateShipping(ShoppingCart sc) {
 
-        if (sc != null) {
-
-            if (sc.getCartItemTotal() >= 0 && sc.getCartItemTotal() < 25) {
-
-                return 2.99;
-
-            } else if (sc.getCartItemTotal() >= 25 && sc.getCartItemTotal() < 50) {
-
-                return 4.99;
-
-            } else if (sc.getCartItemTotal() >= 50 && sc.getCartItemTotal() < 75) {
-
-                return 6.99;
-
-            } else if (sc.getCartItemTotal() >= 75 && sc.getCartItemTotal() < 100) {
-
-                return 8.99;
-
-            } else if (sc.getCartItemTotal() >= 100 && sc.getCartItemTotal() < 10000) {
-
-                return 10.99;
-
-            }
-
+        if (sc == null) {
+            return 0;
         }
 
-        return 0;
+        double total = sc.getCartItemTotal().doubleValue();
+
+        switch ((int) total) {
+            case 0:
+                return 0;
+            case 25:
+                return 2.99;
+            case 50:
+                return 4.99;
+            case 75:
+                return 6.99;
+            case 100:
+                return 8.99;
+            default:
+                return 10.99;
+        }
 
     }
 
     @Override
     public double calculateShippingInsurance(ShoppingCart sc) {
 
-        if (sc != null) {
-
-            if (sc.getCartItemTotal() >= 25 && sc.getCartItemTotal() < 100) {
-
-                return getPercentOfTotal(sc.getCartItemTotal(), 0.02);
-
-            } else if (sc.getCartItemTotal() >= 100 && sc.getCartItemTotal() < 500) {
-
-                return getPercentOfTotal(sc.getCartItemTotal(), 0.015);
-
-            } else if (sc.getCartItemTotal() >= 500 && sc.getCartItemTotal() < 10000) {
-
-                return getPercentOfTotal(sc.getCartItemTotal(), 0.01);
-
-            }
-
+        if (sc == null) {
+            return 0;
         }
 
-        return 0;
-    }
+        double total = sc.getCartItemTotal().doubleValue();
 
-    private static double getPercentOfTotal(double value, double percentOfTotal) {
-        return BigDecimal.valueOf(value * percentOfTotal)
-                .setScale(2, RoundingMode.HALF_UP)
-                .doubleValue();
+        switch ((int) total) {
+            case 25:
+                return sc.getCartItemTotal().multiply(BigDecimal.valueOf(0.02))
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .doubleValue();
+            case 100:
+                return sc.getCartItemTotal().multiply(BigDecimal.valueOf(0.015))
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .doubleValue();
+            case 500:
+                return sc.getCartItemTotal().multiply(BigDecimal.valueOf(0.01))
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .doubleValue();
+            default:
+                return 0;
+        }
     }
 
 }
+

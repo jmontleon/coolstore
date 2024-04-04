@@ -1,19 +1,16 @@
 package com.redhat.coolstore.service;
 
-import java.util.Hashtable;
 import java.util.logging.Logger;
 
-import javax.ejb.Stateful;
 import javax.inject.Inject;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import com.redhat.coolstore.model.Product;
 import com.redhat.coolstore.model.ShoppingCart;
 import com.redhat.coolstore.model.ShoppingCartItem;
+import com.redhat.coolstore.service.PromoService;
+import com.redhat.coolstore.service.ShoppingCartOrderProcessor;
 
-@Stateful
+@Dependent
 public class ShoppingCartService  {
 
     @Inject
@@ -25,27 +22,22 @@ public class ShoppingCartService  {
     @Inject
     PromoService ps;
 
-
     @Inject
     ShoppingCartOrderProcessor shoppingCartOrderProcessor;
 
-    private ShoppingCart cart  = new ShoppingCart(); //Each user can have multiple shopping carts (tabbed browsing)
+    @Inject
+    ShoppingCart shoppingCart;
 
-   
-
-    public ShoppingCartService() {
+    public ShoppingCart getShoppingCart() {
+        return shoppingCart;
     }
 
-    public ShoppingCart getShoppingCart(String cartId) {
-        return cart;
-    }
+    public ShoppingCart checkOutShoppingCart() {
+        ShoppingCart cart = this.getShoppingCart();
 
-    public ShoppingCart checkOutShoppingCart(String cartId) {
-        ShoppingCart cart = this.getShoppingCart(cartId);
-      
         log.info("Sending  order: ");
         shoppingCartOrderProcessor.process(cart);
-   
+
         cart.resetShoppingCartItemList();
         priceShoppingCart(cart);
         return cart;
@@ -69,11 +61,11 @@ public class ShoppingCartService  {
 
                 }
 
-                sc.setShippingTotal(lookupShippingServiceRemote().calculateShipping(sc));
+                sc.setShippingTotal(calculateShipping(sc));
 
                 if (sc.getCartItemTotal() >= 25) {
                     sc.setShippingTotal(sc.getShippingTotal()
-                            + lookupShippingServiceRemote().calculateShippingInsurance(sc));
+                            + calculateShippingInsurance(sc));
                 }
 
             }
@@ -111,16 +103,13 @@ public class ShoppingCartService  {
         return productServices.getProductByItemId(itemId);
     }
 
-	private static ShippingServiceRemote lookupShippingServiceRemote() {
-        try {
-            final Hashtable<String, String> jndiProperties = new Hashtable<>();
-            jndiProperties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");
+    public double calculateShipping(ShoppingCart sc) {
+        // Implement the calculation of shipping cost
+        return 0;
+    }
 
-            final Context context = new InitialContext(jndiProperties);
-
-            return (ShippingServiceRemote) context.lookup("ejb:/ROOT/ShippingService!" + ShippingServiceRemote.class.getName());
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
-        }
+    public double calculateShippingInsurance(ShoppingCart sc) {
+        // Implement the calculation of shipping insurance cost
+        return 0;
     }
 }

@@ -5,17 +5,13 @@ import com.redhat.coolstore.model.Order;
 import com.redhat.coolstore.model.OrderItem;
 import com.redhat.coolstore.model.Product;
 import com.redhat.coolstore.model.ShoppingCart;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.json.JsonWriter;
-
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
@@ -46,47 +42,44 @@ public class Transformers {
     }
 
     public static String shoppingCartToJson(ShoppingCart cart) {
-        JsonArrayBuilder cartItems = Json.createArrayBuilder();
+        JSONArray cartItems = new JSONArray();
         cart.getShoppingCartItemList().forEach(item -> {
-            cartItems.add(Json.createObjectBuilder()
-                .add("productSku",item.getProduct().getItemId())
-                .add("quantity",item.getQuantity())
+            cartItems.put(new JSONObject()
+                .put("productSku",item.getProduct().getItemId())
+                .put("quantity",item.getQuantity())
             );
         });
 
         int randomNameAndEmailIndex = ThreadLocalRandom.current().nextInt(RANDOM_NAMES.length);
 
-        JsonObject jsonObject = Json.createObjectBuilder()
-            .add("orderValue", Double.valueOf(cart.getCartTotal()))
-            .add("customerName",RANDOM_NAMES[randomNameAndEmailIndex])
-            .add("customerEmail",RANDOM_EMAILS[randomNameAndEmailIndex])
-            .add("retailPrice", cart.getShoppingCartItemList().stream().mapToDouble(i -> i.getQuantity()*i.getPrice()).sum())
-            .add("discount", Double.valueOf(cart.getCartItemPromoSavings()))
-            .add("shippingFee", Double.valueOf(cart.getShippingTotal()))
-            .add("shippingDiscount", Double.valueOf(cart.getShippingPromoSavings()))
-            .add("items",cartItems) 
-            .build();
-        StringWriter w = new StringWriter();
-        try (JsonWriter writer = Json.createWriter(w)) {
-            writer.write(jsonObject);
-        }
-        return w.toString();
+        JSONObject jsonObject = new JSONObject()
+            .put("orderValue", cart.getCartTotal())
+            .put("customerName",RANDOM_NAMES[randomNameAndEmailIndex])
+            .put("customerEmail",RANDOM_EMAILS[randomNameAndEmailIndex])
+            .put("retailPrice", cart.getShoppingCartItemList().stream().mapToDouble(i -> i.getQuantity()*i.getPrice()).sum())
+            .put("discount", cart.getCartItemPromoSavings())
+            .put("shippingFee", cart.getShippingTotal())
+            .put("shippingDiscount", cart.getShippingPromoSavings())
+            .put("items",cartItems) 
+            ;
+        return jsonObject.toString();
     }
 
     public static Order jsonToOrder(String json) {
-        JsonReader jsonReader = Json.createReader(new StringReader(json));
-        JsonObject rootObject = jsonReader.readObject();
+        JSONTokener jsonReader = new JSONTokener(json);
+        JSONObject rootObject = new JSONObject(jsonReader);
         Order order = new Order();
         order.setCustomerName(rootObject.getString("customerName"));
         order.setCustomerEmail(rootObject.getString("customerEmail"));
-        order.setOrderValue(rootObject.getJsonNumber("orderValue").doubleValue());
-        order.setRetailPrice(rootObject.getJsonNumber("retailPrice").doubleValue());
-        order.setDiscount(rootObject.getJsonNumber("discount").doubleValue());
-        order.setShippingFee(rootObject.getJsonNumber("shippingFee").doubleValue());
-        order.setShippingDiscount(rootObject.getJsonNumber("shippingDiscount").doubleValue());
-        JsonArray jsonItems = rootObject.getJsonArray("items");
-        List<OrderItem> items = new ArrayList<OrderItem>(jsonItems.size());
-        for (JsonObject jsonItem : jsonItems.getValuesAs(JsonObject.class)) {
+        order.setOrderValue(rootObject.getDouble("orderValue"));
+        order.setRetailPrice(rootObject.getDouble("retailPrice"));
+        order.setDiscount(rootObject.getDouble("discount"));
+        order.setShippingFee(rootObject.getDouble("shippingFee"));
+        order.setShippingDiscount(rootObject.getDouble("shippingDiscount"));
+        JSONArray jsonItems = rootObject.getJSONArray("items");
+        List<OrderItem> items = new ArrayList<OrderItem>(jsonItems.length());
+        for (int i = 0; i < jsonItems.length(); i++) {
+            JSONObject jsonItem = jsonItems.getJSONObject(i);
             OrderItem oi = new OrderItem();
             oi.setProductId(jsonItem.getString("productSku"));
             oi.setQuantity(jsonItem.getInt("quantity"));

@@ -1,18 +1,22 @@
 package com.redhat.coolstore.persistence;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import io.quarkus.hibernate.orm.PersistenceUnit;
+import io.quarkus.hibernate.orm.RuntimePanicException;
+import io.quarkus.hibernate.orm.Session;
+import io.quarkus.hibernate.orm.SessionFactory;
+import javax.inject.Singleton;
 
-@Dependent
+@Singleton
 public class Resources {
 
-    @PersistenceContext
-    private EntityManager em;
+    @PersistenceUnit("default")
+    private SessionFactory sessionFactory;
 
-    @Produces
-    public EntityManager getEntityManager() {
-        return em;
+    public Session getEntityManager() {
+        Session session = sessionFactory.getSession();
+        if (session == null) {
+            throw new RuntimePanicException("Unable to get a Hibernate Session.");
+        }
+        return session;
     }
 }

@@ -1,29 +1,24 @@
 package com.redhat.coolstore.service;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import com.redhat.coolstore.model.Promotion;
 import com.redhat.coolstore.model.ShoppingCart;
 import com.redhat.coolstore.model.ShoppingCartItem;
 
 @ApplicationScoped
-public class PromoService implements Serializable {
-
-    private static final long serialVersionUID = 2088590587856645568L;
+public class PromoService {
 
     private String name = null;
 
-    private Set<Promotion> promotionSet = null;
+    private Set<Promotion> promotionSet = new HashSet<>();
 
     public PromoService() {
-
-        promotionSet = new HashSet<>();
 
         promotionSet.add(new Promotion("329299", .25));
 
@@ -78,27 +73,13 @@ public class PromoService implements Serializable {
 
     public Set<Promotion> getPromotions() {
 
-        if (promotionSet == null) {
-
-            promotionSet = new HashSet<>();
-
-        }
-
-        return new HashSet<>(promotionSet);
+        return promotionSet;
 
     }
 
     public void setPromotions(Set<Promotion> promotionSet) {
 
-        if (promotionSet != null) {
-
-            this.promotionSet = new HashSet<>(promotionSet);
-
-        } else {
-
-            this.promotionSet = new HashSet<>();
-
-        }
+        this.promotionSet = promotionSet;
 
     }
 

@@ -1,21 +1,17 @@
 package com.redhat.coolstore.rest;
 
-import java.io.Serializable;
 import java.util.List;
-
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 
 import com.redhat.coolstore.model.Product;
 import com.redhat.coolstore.service.ProductService;
+import io.quarkus.arc.inject.Inject;
+import org.jboss.resteasy.reactive.common.core.MediaType;
 
-@RequestScoped
+@ApplicationScoped
 @Path("/products")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class ProductEndpoint implements Serializable {
+public class ProductEndpoint {
 
     /**
      *
@@ -39,3 +35,4 @@ public class ProductEndpoint implements Serializable {
     }
 
 }
+

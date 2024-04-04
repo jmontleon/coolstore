@@ -2,26 +2,22 @@ package com.redhat.coolstore.service;
 
 import com.redhat.coolstore.model.CatalogItemEntity;
 import com.redhat.coolstore.model.Product;
-import com.redhat.coolstore.utils.Transformers;
+import com.redhat.coolstore.transformers.Transformers;
 
-import javax.ejb.Stateless;
-import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.redhat.coolstore.utils.Transformers.toProduct;
-
-@Stateless
+@ApplicationScoped
 public class ProductService {
 
-    @Inject
-    CatalogService cm;
+    private CatalogService cm;
 
-    public ProductService() {
+    public ProductService(CatalogService cm) {
+        this.cm = cm;
     }
 
     public List<Product> getProducts() {
-        return cm.getCatalogItems().stream().map(entity -> toProduct(entity)).collect(Collectors.toList());
+        return cm.getCatalogItems().stream().map(Transformers.ToProduct::transform).collect(Collectors.toList());
     }
 
     public Product getProductByItemId(String itemId) {
@@ -30,7 +26,8 @@ public class ProductService {
             return null;
 
         // Return the entity
-        return Transformers.toProduct(entity);
+        return Transformers.ToProduct.transform(entity);
     }
 
 }
+

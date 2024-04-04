@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
-import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -21,8 +21,7 @@ import com.redhat.coolstore.model.ShoppingCart;
 import com.redhat.coolstore.model.ShoppingCartItem;
 import com.redhat.coolstore.service.ShoppingCartService;
 
-@SessionScoped
-@Path("/cart")
+// Removed @SessionScoped annotation
 public class CartEndpoint implements Serializable {
 
 	private static final long serialVersionUID = -7227732980791688773L;
@@ -146,3 +145,4 @@ public class CartEndpoint implements Serializable {
 		return result;
 	}
 }
+

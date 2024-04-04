@@ -1,3 +1,8 @@
+<!--
+    This file is not needed for Quarkus.
+    Quarkus uses annotation-based configuration and metadata.
+    Remove this file in a later step of the migration process.
+-->
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     JBoss, Home of Professional Open Source

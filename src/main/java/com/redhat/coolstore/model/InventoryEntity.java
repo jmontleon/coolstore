@@ -1,32 +1,26 @@
 package com.redhat.coolstore.model;
 
-import java.io.Serializable;
+import io.quarkus.hibernate.orm.PanacheEntity;
+import io.quarkus.hibernate.orm.PanacheEntityBase;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-@XmlRootElement
 @Table(name = "INVENTORY", uniqueConstraints = @UniqueConstraint(columnNames = "itemId"))
-public class InventoryEntity implements Serializable {
-
-	private static final long serialVersionUID = 7526472295622776147L; 
+public class InventoryEntity extends PanacheEntityBase {
 
     @Id
     private String itemId;
 
-
     @Column
     private String location;
 
-
     @Column
     private int quantity;
-
 
     @Column
     private String link;

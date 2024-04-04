@@ -1,10 +1,8 @@
 package com.redhat.coolstore.rest;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import javax.ws.rs.Path;
 
-
-@ApplicationPath("/services")
-public class RestApplication extends Application {
+@Path("/services")
+public class RestApplication {
 
 }
