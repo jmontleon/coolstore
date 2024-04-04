@@ -1,24 +1,22 @@
 package com.redhat.coolstore.utils;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Initialized;
+import jakarta.inject.Inject;
+import jakarta.transaction.TransactionManagement;
+import jakarta.transaction.TransactionManagementType;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
-import javax.inject.Inject;
-import javax.sql.DataSource;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Created by tqvarnst on 2017-04-04.
  */
-@Singleton
-@Startup
+@ApplicationScoped
+@ApplicationScoped
 @TransactionManagement(TransactionManagementType.BEAN)
 public class DataBaseMigrationStartup {
 
@@ -29,7 +27,7 @@ public class DataBaseMigrationStartup {
     DataSource dataSource;
 
     @PostConstruct
-    private void startup() {
+    private void startup(@Initialized(ApplicationScoped.class) Iterable<Object> initParams) {
 
 
         try {
